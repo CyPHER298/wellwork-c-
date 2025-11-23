@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using WellworkGS.Data;
-using WellworkGS.Infra.Persistence.Models;
+using WellworkGS.DTOs;
+using WellworkGS.Service;
 
 namespace WellworkGS.Controllers;
 
@@ -9,62 +8,46 @@ namespace WellworkGS.Controllers;
 [Route("api/[controller]")]
 public class UsuarioController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly UsuarioService _service;
 
-    public UsuarioController(AppDbContext context)
+    public UsuarioController(UsuarioService service)
     {
-        _context = context;
+        _service = service;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Usuario>>> GetAll()
+    public async Task<ActionResult<IEnumerable<UsuarioReadDTO>>> GetAll()
     {
-        return await _context.Usuarios.ToListAsync();
+        var result = await _service.GetAllAsync();
+        return Ok(result);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Usuario>> GetById(int id)
+    public async Task<ActionResult<UsuarioReadDTO>> GetById(int id)
     {
-        var usuario = await _context.Usuarios.FindAsync(id);
-
-        if (usuario == null)
-            return NotFound();
-
-        return usuario;
+        var user = await _service.GetByIdAsync(id);
+        if (user == null) return NotFound();
+        return Ok(user);
     }
 
     [HttpPost]
-    public async Task<ActionResult<Usuario>> Create(Usuario usuario)
+    public async Task<ActionResult<UsuarioReadDTO>> Create([FromBody] UsuarioCreateDTO dto)
     {
-        _context.Usuarios.Add(usuario);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetById), new { id = usuario.IdUsuario }, usuario);
+        var created = await _service.CreateAsync(dto);
+        return CreatedAtAction(nameof(GetById), new { id = created.IdUsuario }, created);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, Usuario usuario)
+    public async Task<IActionResult> Update(int id, [FromBody] UsuarioUpdateDTO dto)
     {
-        if (id != usuario.IdUsuario)
-            return BadRequest();
-
-        _context.Entry(usuario).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
-
-        return NoContent();
+        var success = await _service.UpdateAsync(id, dto);
+        return success ? NoContent() : NotFound();
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var usuario = await _context.Usuarios.FindAsync(id);
-
-        if (usuario == null)
-            return NotFound();
-
-        _context.Usuarios.Remove(usuario);
-        await _context.SaveChangesAsync();
-
-        return NoContent();
+        var success = await _service.DeleteAsync(id);
+        return success ? NoContent() : NotFound();
     }
 }

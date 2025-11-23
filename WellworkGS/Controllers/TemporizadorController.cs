@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WellworkGS.Data;
+using WellworkGS.DTOs;
 using WellworkGS.Infra.Persistence.Models;
+using WellworkGS.Service;
 
 namespace WellworkGS.Controllers;
 
@@ -9,50 +11,45 @@ namespace WellworkGS.Controllers;
 [Route("api/[controller]")]
 public class TemporizadorController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly TemporizadorService _service;
 
-    public TemporizadorController(AppDbContext context)
+    public TemporizadorController(TemporizadorService service)
     {
-        _context = context;
+        _service = service;
     }
 
     [HttpGet]
-    public async Task<IEnumerable<Temporizador>> GetAll()
-        => await _context.Temporizadores.ToListAsync();
+    public async Task<ActionResult<IEnumerable<TemporizadorReadDTO>>> GetAll()
+    {
+        var result = await _service.GetAllAsync();
+        return Ok(result);
+    }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Temporizador>> Get(int id)
+    public async Task<ActionResult<TemporizadorReadDTO>> GetById(int id)
     {
-        var timer = await _context.Temporizadores.FindAsync(id);
-        return timer == null ? NotFound() : timer;
+        var temporizador = await _service.GetByIdAsync(id);
+        return temporizador == null ? NotFound() : Ok(temporizador);
     }
 
     [HttpPost]
-    public async Task<ActionResult> Create(Temporizador temporizador)
+    public async Task<ActionResult<TemporizadorReadDTO>> Create([FromBody] TemporizadorCreateDTO dto)
     {
-        _context.Temporizadores.Add(temporizador);
-        await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(Get), new { id = temporizador.IdTemporizador }, temporizador);
+        var created = await _service.CreateAsync(dto);
+        return CreatedAtAction(nameof(GetById), new { id = created.IdTemporizador }, created);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, Temporizador temporizador)
+    public async Task<IActionResult> Update(int id, [FromBody] TemporizadorUpdateDTO dto)
     {
-        if (id != temporizador.IdTemporizador) return BadRequest();
-
-        _context.Entry(temporizador).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
-        return NoContent();
+        var success = await _service.UpdateAsync(id, dto);
+        return success ? NoContent() : NotFound();
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var temporizador = await _context.Temporizadores.FindAsync(id);
-        if (temporizador == null) return NotFound();
-
-        _context.Temporizadores.Remove(temporizador);
-        await _context.SaveChangesAsync();
-        return NoContent();
+        var success = await _service.DeleteAsync(id);
+        return success ? NoContent() : NotFound();
     }
 }

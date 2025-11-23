@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WellworkGS.Data;
+using WellworkGS.DTOs;
 using WellworkGS.Infra.Persistence.Models;
+using WellworkGS.Service;
 
 namespace WellworkGS.Controllers;
 
@@ -9,50 +11,45 @@ namespace WellworkGS.Controllers;
 [Route("api/[controller]")]
 public class LembreteController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly LembreteService _service;
 
-    public LembreteController(AppDbContext context)
+    public LembreteController(LembreteService service)
     {
-        _context = context;
+        _service = service;
     }
 
     [HttpGet]
-    public async Task<IEnumerable<Lembrete>> GetAll()
-        => await _context.Lembretes.ToListAsync();
+    public async Task<ActionResult<IEnumerable<LembreteReadDTO>>> GetAll()
+    {
+        var result = await _service.GetAllAsync();
+        return Ok(result);
+    }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Lembrete>> Get(int id)
+    public async Task<ActionResult<LembreteReadDTO>> GetById(int id)
     {
-        var item = await _context.Lembretes.FindAsync(id);
-        return item == null ? NotFound() : item;
+        var lembrete = await _service.GetByIdAsync(id);
+        return lembrete == null ? NotFound() : Ok(lembrete);
     }
 
     [HttpPost]
-    public async Task<ActionResult> Create(Lembrete lemb)
+    public async Task<ActionResult<LembreteReadDTO>> Create([FromBody] LembreteCreateDTO dto)
     {
-        _context.Lembretes.Add(lemb);
-        await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(Get), new { id = lemb.IdLembrete }, lemb);
+        var created = await _service.CreateAsync(dto);
+        return CreatedAtAction(nameof(GetById), new { id = created.IdLembrete }, created);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, Lembrete lemb)
+    public async Task<IActionResult> Update(int id, [FromBody] LembreteUpdateDTO dto)
     {
-        if (id != lemb.IdLembrete) return BadRequest();
-
-        _context.Entry(lemb).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
-        return NoContent();
+        var success = await _service.UpdateAsync(id, dto);
+        return success ? NoContent() : NotFound();
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var lemb = await _context.Lembretes.FindAsync(id);
-        if (lemb == null) return NotFound();
-
-        _context.Lembretes.Remove(lemb);
-        await _context.SaveChangesAsync();
-        return NoContent();
+        var success = await _service.DeleteAsync(id);
+        return success ? NoContent() : NotFound();
     }
 }

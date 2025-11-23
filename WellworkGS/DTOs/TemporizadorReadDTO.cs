@@ -2,7 +2,7 @@
 
 public class TemporizadorReadDTO
 {
-    public int idTemporizador { get; set; }
+    public int IdTemporizador { get; set; }
     public int IdUsuario { get; set; }
     public string TipoTemporizador { get; set; }
     public int? Duracao { get; set; }

@@ -1,23 +1,84 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
+using WellworkGS.Data;
+using WellworkGS.Infra.Persistence.Repository;
+using WellworkGS.Service;
+using WellworkGS.Utils;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+        var swaggerConfig = builder.Configuration
+            .GetSection("Swagger")
+            .Get<SwaggerConfig>();
 
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
 
-var app = builder.Build();
+        builder.Services.AddControllers();
+        builder.Services.AddEndpointsApiExplorer();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+        builder.Services.AddSwaggerGen(swagger =>
+        {
+            swagger.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = swaggerConfig.Title,
+                Version = "v1",
+                Description = swaggerConfig.Description,
+                Contact = swaggerConfig.Contact
+            });
 
-app.UseHttpsRedirection();
+            swagger.EnableAnnotations();
 
-app.UseAuthorization();
+            foreach (var server in swaggerConfig.Servers)
+            {
+                swagger.AddServer(new OpenApiServer
+                {
+                    Url = server.Url,
+                    Description = server.Name
+                });
+            }
+        });
 
-app.MapControllers();
+        builder.Services.AddDbContext<AppDbContext>(options =>
+            options.UseOracle(builder.Configuration.GetConnectionString("WellworkGS"))
+        );
 
-app.Run();
+        builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+        builder.Services.AddScoped<IGestorRepository, GestorRepository>();
+        builder.Services.AddScoped<ITarefaRepository, TarefaRepository>();
+        builder.Services.AddScoped<ITemporizadorRepository, TemporizadorRepository>();
+        builder.Services.AddScoped<IMetaRepository, MetaRepository>();
+        builder.Services.AddScoped<ILembreteRepository, LembreteRepository>();
+        builder.Services.AddScoped<IAlertaCriseRepository, AlertaCriseRepository>();
+
+        builder.Services.AddScoped<UsuarioService>();
+        builder.Services.AddScoped<GestorService>();
+        builder.Services.AddScoped<TarefaService>();
+        builder.Services.AddScoped<TemporizadorService>();
+        builder.Services.AddScoped<MetaService>();
+        builder.Services.AddScoped<LembreteService>();
+        builder.Services.AddScoped<AlertaCriseService>();
+
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddOpenApi();
+
+        // ============================================
+        // APP
+        // ============================================
+
+        var app = builder.Build();
+
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI(ui =>
+            {
+                ui.SwaggerEndpoint("/swagger/v1/swagger.json", "WellworkGS API v1");
+                ui.RoutePrefix = string.Empty;
+            });
+
+            app.MapOpenApi();
+        }
+
+        app.UseHttpsRedirection();
+        app.UseAuthorization();
+        app.MapControllers();
+        app.Run();

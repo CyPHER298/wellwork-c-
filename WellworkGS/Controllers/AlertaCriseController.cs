@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WellworkGS.Data;
+using WellworkGS.DTOs;
 using WellworkGS.Infra.Persistence.Models;
+using WellworkGS.Service;
 
 namespace WellworkGS.Controllers;
 
@@ -9,57 +11,45 @@ namespace WellworkGS.Controllers;
 [Route("api/[controller]")]
 public class AlertaCriseController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly AlertaCriseService _service;
 
-    public AlertaCriseController(AppDbContext context)
+    public AlertaCriseController(AlertaCriseService service)
     {
-        _context = context;
+        _service = service;
     }
 
     [HttpGet]
-    public async Task<IEnumerable<AlertaCrise>> GetAll()
-        => await _context.AlertasCrise
-            .Include(a => a.Usuario)
-            .Include(a => a.Gestor)
-            .ToListAsync();
+    public async Task<ActionResult<IEnumerable<AlertaCriseReadDTO>>> GetAll()
+    {
+        var result = await _service.GetAllAsync();
+        return Ok(result);
+    }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<AlertaCrise>> Get(int id)
+    public async Task<ActionResult<AlertaCriseReadDTO>> GetById(int id)
     {
-        var item = await _context.AlertasCrise
-            .Include(a => a.Usuario)
-            .Include(a => a.Gestor)
-            .FirstOrDefaultAsync(a => a.IdAlertaCrise == id);
-
-        return item == null ? NotFound() : item;
+        var alerta = await _service.GetByIdAsync(id);
+        return alerta == null ? NotFound() : Ok(alerta);
     }
 
     [HttpPost]
-    public async Task<ActionResult> Create(AlertaCrise alerta)
+    public async Task<ActionResult<AlertaCriseReadDTO>> Create([FromBody] AlertaCriseCreateDTO dto)
     {
-        _context.AlertasCrise.Add(alerta);
-        await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(Get), new { id = alerta.IdAlertaCrise }, alerta);
+        var created = await _service.CreateAsync(dto);
+        return CreatedAtAction(nameof(GetById), new { id = created.IdAlertaCrise }, created);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, AlertaCrise alerta)
+    public async Task<IActionResult> Update(int id, [FromBody] AlertaCriseUpdateDTO dto)
     {
-        if (id != alerta.IdAlertaCrise) return BadRequest();
-
-        _context.Entry(alerta).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
-        return NoContent();
+        var success = await _service.UpdateAsync(id, dto);
+        return success ? NoContent() : NotFound();
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var item = await _context.AlertasCrise.FindAsync(id);
-        if (item == null) return NotFound();
-
-        _context.AlertasCrise.Remove(item);
-        await _context.SaveChangesAsync();
-        return NoContent();
+        var success = await _service.DeleteAsync(id);
+        return success ? NoContent() : NotFound();
     }
 }

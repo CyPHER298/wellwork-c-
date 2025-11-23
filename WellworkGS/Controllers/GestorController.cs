@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WellworkGS.Data;
+using WellworkGS.DTOs;
 using WellworkGS.Infra.Persistence.Models;
+using WellworkGS.Service;
 
 namespace WellworkGS.Controllers;
 
@@ -9,50 +11,45 @@ namespace WellworkGS.Controllers;
 [Route("api/[controller]")]
 public class GestorController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly GestorService _service;
 
-    public GestorController(AppDbContext context)
+    public GestorController(GestorService service)
     {
-        _context = context;
+        _service = service;
     }
 
     [HttpGet]
-    public async Task<IEnumerable<Gestor>> GetAll()
-        => await _context.Gestores.ToListAsync();
+    public async Task<ActionResult<IEnumerable<GestorReadDTO>>> GetAll()
+    {
+        var result = await _service.GetAllAsync();
+        return Ok(result);
+    }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Gestor>> Get(int id)
+    public async Task<ActionResult<GestorReadDTO>> GetById(int id)
     {
-        var gestor = await _context.Gestores.FindAsync(id);
-        return gestor == null ? NotFound() : gestor;
+        var gestor = await _service.GetByIdAsync(id);
+        return gestor == null ? NotFound() : Ok(gestor);
     }
 
     [HttpPost]
-    public async Task<ActionResult> Create(Gestor gestor)
+    public async Task<ActionResult<GestorReadDTO>> Create([FromBody] GestorCreateDTO dto)
     {
-        _context.Gestores.Add(gestor);
-        await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(Get), new { id = gestor.IdGestor }, gestor);
+        var created = await _service.CreateAsync(dto);
+        return CreatedAtAction(nameof(GetById), new { id = created.IdGestor }, created);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, Gestor gestor)
+    public async Task<IActionResult> Update(int id, [FromBody] GestorUpdateDTO dto)
     {
-        if (id != gestor.IdGestor) return BadRequest();
-
-        _context.Entry(gestor).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
-        return NoContent();
+        var success = await _service.UpdateAsync(id, dto);
+        return success ? NoContent() : NotFound();
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var gestor = await _context.Gestores.FindAsync(id);
-        if (gestor == null) return NotFound();
-
-        _context.Remove(gestor);
-        await _context.SaveChangesAsync();
-        return NoContent();
+        var success = await _service.DeleteAsync(id);
+        return success ? NoContent() : NotFound();
     }
 }

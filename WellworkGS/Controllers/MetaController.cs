@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WellworkGS.Data;
+using WellworkGS.DTOs;
 using WellworkGS.Infra.Persistence.Models;
+using WellworkGS.Service;
 
 namespace WellworkGS.Controllers;
 
@@ -9,50 +11,45 @@ namespace WellworkGS.Controllers;
 [Route("api/[controller]")]
 public class MetaController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly MetaService _service;
 
-    public MetaController(AppDbContext context)
+    public MetaController(MetaService service)
     {
-        _context = context;
+        _service = service;
     }
 
     [HttpGet]
-    public async Task<IEnumerable<Meta>> GetAll()
-        => await _context.Metas.ToListAsync();
+    public async Task<ActionResult<IEnumerable<MetaReadDTO>>> GetAll()
+    {
+        var result = await _service.GetAllAsync();
+        return Ok(result);
+    }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Meta>> Get(int id)
+    public async Task<ActionResult<MetaReadDTO>> GetById(int id)
     {
-        var meta = await _context.Metas.FindAsync(id);
-        return meta == null ? NotFound() : meta;
+        var meta = await _service.GetByIdAsync(id);
+        return meta == null ? NotFound() : Ok(meta);
     }
 
     [HttpPost]
-    public async Task<ActionResult> Create(Meta meta)
+    public async Task<ActionResult<MetaReadDTO>> Create([FromBody] MetaCreateDTO dto)
     {
-        _context.Metas.Add(meta);
-        await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(Get), new { id = meta.IdMeta }, meta);
+        var created = await _service.CreateAsync(dto);
+        return CreatedAtAction(nameof(GetById), new { id = created.IdMeta }, created);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, Meta meta)
+    public async Task<IActionResult> Update(int id, [FromBody] MetaUpdateDTO dto)
     {
-        if (id != meta.IdMeta) return BadRequest();
-
-        _context.Entry(meta).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
-        return NoContent();
+        var success = await _service.UpdateAsync(id, dto);
+        return success ? NoContent() : NotFound();
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var meta = await _context.Metas.FindAsync(id);
-        if (meta == null) return NotFound();
-
-        _context.Metas.Remove(meta);
-        await _context.SaveChangesAsync();
-        return NoContent();
+        var success = await _service.DeleteAsync(id);
+        return success ? NoContent() : NotFound();
     }
 }
