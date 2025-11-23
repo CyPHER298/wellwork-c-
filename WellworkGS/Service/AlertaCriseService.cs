@@ -2,87 +2,89 @@
 using WellworkGS.Data;
 using WellworkGS.DTOs;
 using WellworkGS.Infra.Persistence.Models;
+using WellworkGS.Infra.Persistence.Repository;
 
 namespace WellworkGS.Service;
 
 public class AlertaCriseService
 {
-    private readonly AppDbContext _context;
+private readonly IAlertaCriseRepository _repository;
 
-        public AlertaCriseService(AppDbContext context)
+    public AlertaCriseService(IAlertaCriseRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task<IEnumerable<AlertaCriseReadDTO>> GetAllAsync()
+    {
+        var list = await _repository.GetAllAsync();
+
+        return list.Select(a => new AlertaCriseReadDTO
         {
-            _context = context;
-        }
+            IdAlertaCrise = a.IdAlertaCrise,
+            IdUsuario = a.IdUsuario,
+            IdGestor = a.IdGestor,
+            DataHoraAlerta = a.DataHoraAlerta,
+            StatusAlerta = a.StatusAlerta
+        });
+    }
 
-        public async Task<IEnumerable<AlertaCriseReadDTO>> GetAllAsync()
+    public async Task<AlertaCriseReadDTO?> GetByIdAsync(int id)
+    {
+        var a = await _repository.GetByIdAsync(id);
+        if (a == null) return null;
+
+        return new AlertaCriseReadDTO
         {
-            return await _context.AlertasCrise
-                .Select(a => new AlertaCriseReadDTO
-                {
-                    IdAlertaCrise = a.IdAlertaCrise,
-                    IdUsuario = a.IdUsuario,
-                    IdGestor = a.IdGestor,
-                    DataHoraAlerta = a.DataHoraAlerta,
-                    StatusAlerta = a.StatusAlerta
-                })
-                .ToListAsync();
-        }
+            IdAlertaCrise = a.IdAlertaCrise,
+            IdUsuario = a.IdUsuario,
+            IdGestor = a.IdGestor,
+            DataHoraAlerta = a.DataHoraAlerta,
+            StatusAlerta = a.StatusAlerta
+        };
+    }
 
-        public async Task<AlertaCriseReadDTO?> GetByIdAsync(int id)
+    public async Task<AlertaCriseReadDTO> CreateAsync(AlertaCriseCreateDTO dto)
+    {
+        var entity = new AlertaCrise
         {
-            var entity = await _context.AlertasCrise.FindAsync(id);
-            return entity == null
-                ? null
-                : new AlertaCriseReadDTO
-                {
-                    IdAlertaCrise = entity.IdAlertaCrise,
-                    IdUsuario = entity.IdUsuario,
-                    IdGestor = entity.IdGestor,
-                    DataHoraAlerta = entity.DataHoraAlerta,
-                    StatusAlerta = entity.StatusAlerta
-                };
-        }
+            IdUsuario = dto.IdUsuario,
+            IdGestor = dto.IdGestor,
+            StatusAlerta = dto.StatusAlerta,
+            DataHoraAlerta = DateTime.Now
+        };
 
-        public async Task<AlertaCriseReadDTO> CreateAsync(AlertaCriseCreateDTO dto)
+        await _repository.AddAsync(entity);
+
+        return new AlertaCriseReadDTO
         {
-            var entity = new AlertaCrise
-            {
-                IdUsuario = dto.IdUsuario,
-                IdGestor = dto.IdGestor,
-                DataHoraAlerta = DateTime.Now,
-                StatusAlerta = dto.StatusAlerta
-            };
+            IdAlertaCrise = entity.IdAlertaCrise,
+            IdUsuario = entity.IdUsuario,
+            IdGestor = entity.IdGestor,
+            DataHoraAlerta = entity.DataHoraAlerta,
+            StatusAlerta = entity.StatusAlerta
+        };
+    }
 
-            _context.AlertasCrise.Add(entity);
-            await _context.SaveChangesAsync();
+    public async Task<bool> UpdateAsync(int id, AlertaCriseUpdateDTO dto)
+    {
+        var a = await _repository.GetByIdAsync(id);
+        if (a == null) return false;
 
-            return new AlertaCriseReadDTO
-            {
-                IdAlertaCrise = entity.IdAlertaCrise,
-                IdUsuario = entity.IdUsuario,
-                IdGestor = entity.IdGestor,
-                DataHoraAlerta = entity.DataHoraAlerta,
-                StatusAlerta = entity.StatusAlerta
-            };
-        }
+        a.StatusAlerta = dto.StatusAlerta;
 
-        public async Task<bool> UpdateAsync(int id, AlertaCriseUpdateDTO dto)
-        {
-            var entity = await _context.AlertasCrise.FindAsync(id);
-            if (entity == null) return false;
+        _repository.Update(a);
+        await _repository.SaveChangesAsync();
 
-            entity.StatusAlerta = dto.StatusAlerta;
-            await _context.SaveChangesAsync();
-            return true;
-        }
+        return true;
+    }
 
-        public async Task<bool> DeleteAsync(int id)
-        {
-            var entity = await _context.AlertasCrise.FindAsync(id);
-            if (entity == null) return false;
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var a = await _repository.GetByIdAsync(id);
+        if (a == null) return false;
 
-            _context.AlertasCrise.Remove(entity);
-            await _context.SaveChangesAsync();
-            return true;
-        }
+        await _repository.DeleteAsync(id);
+        return true;
+    }
 }

@@ -2,45 +2,46 @@
 using WellworkGS.Data;
 using WellworkGS.DTOs;
 using WellworkGS.Infra.Persistence.Models;
+using WellworkGS.Infra.Persistence.Repository;
 
 namespace WellworkGS.Service;
 
 public class GestorService
 {
-    private readonly AppDbContext _context;
+private readonly IGestorRepository _repository;
 
-    public GestorService(AppDbContext context)
+    public GestorService(IGestorRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
 
     public async Task<IEnumerable<GestorReadDTO>> GetAllAsync()
     {
-        return await _context.Gestores
-            .Select(g => new GestorReadDTO
-            {
-                IdGestor = g.IdGestor,
-                NomeGestor = g.NomeGestor,
-                EmailGestor = g.EmailGestor,
-                CargoGestor = g.CargoGestor,
-                Departamento = g.Departamento
-            })
-            .ToListAsync();
+        var items = await _repository.GetAllAsync();
+
+        return items.Select(g => new GestorReadDTO
+        {
+            IdGestor = g.IdGestor,
+            NomeGestor = g.NomeGestor,
+            EmailGestor = g.EmailGestor,
+            CargoGestor = g.CargoGestor,
+            Departamento = g.Departamento
+        });
     }
 
     public async Task<GestorReadDTO?> GetByIdAsync(int id)
     {
-        var gestor = await _context.Gestores.FindAsync(id);
-        return gestor == null
-            ? null
-            : new GestorReadDTO
-            {
-                IdGestor = gestor.IdGestor,
-                NomeGestor = gestor.NomeGestor,
-                EmailGestor = gestor.EmailGestor,
-                CargoGestor = gestor.CargoGestor,
-                Departamento = gestor.Departamento
-            };
+        var g = await _repository.GetByIdAsync(id);
+        if (g == null) return null;
+
+        return new GestorReadDTO
+        {
+            IdGestor = g.IdGestor,
+            NomeGestor = g.NomeGestor,
+            EmailGestor = g.EmailGestor,
+            CargoGestor = g.CargoGestor,
+            Departamento = g.Departamento
+        };
     }
 
     public async Task<GestorReadDTO> CreateAsync(GestorCreateDTO dto)
@@ -54,8 +55,7 @@ public class GestorService
             Departamento = dto.Departamento
         };
 
-        _context.Gestores.Add(entity);
-        await _context.SaveChangesAsync();
+        await _repository.AddAsync(entity);
 
         return new GestorReadDTO
         {
@@ -69,25 +69,25 @@ public class GestorService
 
     public async Task<bool> UpdateAsync(int id, GestorUpdateDTO dto)
     {
-        var gestor = await _context.Gestores.FindAsync(id);
-        if (gestor == null) return false;
+        var g = await _repository.GetByIdAsync(id);
+        if (g == null) return false;
 
-        gestor.NomeGestor = dto.NomeGestor;
-        gestor.EmailGestor = dto.EmailGestor;
-        gestor.CargoGestor = dto.CargoGestor;
-        gestor.Departamento = dto.Departamento;
+        g.NomeGestor = dto.NomeGestor;
+        g.EmailGestor = dto.EmailGestor;
+        g.CargoGestor = dto.CargoGestor;
+        g.Departamento = dto.Departamento;
 
-        await _context.SaveChangesAsync();
+        _repository.Update(g);
+        await _repository.SaveChangesAsync();
         return true;
     }
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var gestor = await _context.Gestores.FindAsync(id);
-        if (gestor == null) return false;
+        var g = await _repository.GetByIdAsync(id);
+        if (g == null) return false;
 
-        _context.Gestores.Remove(gestor);
-        await _context.SaveChangesAsync();
+        await _repository.DeleteAsync(id);
         return true;
     }
 }

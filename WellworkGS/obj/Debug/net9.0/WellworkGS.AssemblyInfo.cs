@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WellworkGS")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8c8fa74265ca9aa240a08e3eea8ab26b999a92b6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1165d370b505f04683ddf2ddebc45d75c4198874")]
 [assembly: System.Reflection.AssemblyProductAttribute("WellworkGS")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WellworkGS")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

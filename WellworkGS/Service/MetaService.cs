@@ -2,84 +2,86 @@
 using WellworkGS.Data;
 using WellworkGS.DTOs;
 using WellworkGS.Infra.Persistence.Models;
+using WellworkGS.Infra.Persistence.Repository;
 
 namespace WellworkGS.Service;
 
 public class MetaService
 {
-    private readonly AppDbContext _context;
+    private readonly IMetaRepository _repository;
 
-        public MetaService(AppDbContext context)
+    public MetaService(IMetaRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task<IEnumerable<MetaReadDTO>> GetAllAsync()
+    {
+        var list = await _repository.GetAllAsync();
+
+        return list.Select(m => new MetaReadDTO
         {
-            _context = context;
-        }
+            IdMeta = m.IdMeta,
+            TituloMeta = m.TituloMeta,
+            DescricaoMeta = m.DescricaoMeta,
+            IdUsuario = m.IdUsuario
+        });
+    }
 
-        public async Task<IEnumerable<MetaReadDTO>> GetAllAsync()
+    public async Task<MetaReadDTO?> GetByIdAsync(int id)
+    {
+        var m = await _repository.GetByIdAsync(id);
+        if (m == null) return null;
+
+        return new MetaReadDTO
         {
-            return await _context.Metas
-                .Select(m => new MetaReadDTO
-                {
-                    IdMeta = m.IdMeta,
-                    TituloMeta = m.TituloMeta,
-                    DescricaoMeta = m.DescricaoMeta,
-                    IdUsuario = m.IdUsuario
-                }).ToListAsync();
-        }
+            IdMeta = m.IdMeta,
+            TituloMeta = m.TituloMeta,
+            DescricaoMeta = m.DescricaoMeta,
+            IdUsuario = m.IdUsuario
+        };
+    }
 
-        public async Task<MetaReadDTO?> GetByIdAsync(int id)
+    public async Task<MetaReadDTO> CreateAsync(MetaCreateDTO dto)
+    {
+        var entity = new Meta
         {
-            var entity = await _context.Metas.FindAsync(id);
-            return entity == null
-                ? null
-                : new MetaReadDTO
-                {
-                    IdMeta = entity.IdMeta,
-                    TituloMeta = entity.TituloMeta,
-                    DescricaoMeta = entity.DescricaoMeta,
-                    IdUsuario = entity.IdUsuario
-                };
-        }
+            TituloMeta = dto.TituloMeta,
+            DescricaoMeta = dto.DescricaoMeta,
+            IdUsuario = dto.IdUsuario
+        };
 
-        public async Task<MetaReadDTO> CreateAsync(MetaCreateDTO dto)
+        await _repository.AddAsync(entity);
+
+        return new MetaReadDTO
         {
-            var entity = new Meta
-            {
-                TituloMeta = dto.TituloMeta,
-                DescricaoMeta = dto.DescricaoMeta,
-                IdUsuario = dto.IdUsuario
-            };
+            IdMeta = entity.IdMeta,
+            TituloMeta = entity.TituloMeta,
+            DescricaoMeta = entity.DescricaoMeta,
+            IdUsuario = entity.IdUsuario
+        };
+    }
 
-            _context.Metas.Add(entity);
-            await _context.SaveChangesAsync();
+    public async Task<bool> UpdateAsync(int id, MetaUpdateDTO dto)
+    {
+        var m = await _repository.GetByIdAsync(id);
+        if (m == null) return false;
 
-            return new MetaReadDTO
-            {
-                IdMeta = entity.IdMeta,
-                TituloMeta = entity.TituloMeta,
-                DescricaoMeta = entity.DescricaoMeta,
-                IdUsuario = entity.IdUsuario
-            };
-        }
+        m.TituloMeta = dto.TituloMeta;
+        m.DescricaoMeta = dto.DescricaoMeta;
 
-        public async Task<bool> UpdateAsync(int id, MetaUpdateDTO dto)
-        {
-            var entity = await _context.Metas.FindAsync(id);
-            if (entity == null) return false;
+        _repository.Update(m);
+        await _repository.SaveChangesAsync();
 
-            entity.TituloMeta = dto.TituloMeta;
-            entity.DescricaoMeta = dto.DescricaoMeta;
+        return true;
+    }
 
-            await _context.SaveChangesAsync();
-            return true;
-        }
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var m = await _repository.GetByIdAsync(id);
+        if (m == null) return false;
 
-        public async Task<bool> DeleteAsync(int id)
-        {
-            var entity = await _context.Metas.FindAsync(id);
-            if (entity == null) return false;
-
-            _context.Metas.Remove(entity);
-            await _context.SaveChangesAsync();
-            return true;
-        }
+        await _repository.DeleteAsync(id);
+        return true;
+    }
 }

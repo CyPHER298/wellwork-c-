@@ -2,99 +2,101 @@
 using WellworkGS.Data;
 using WellworkGS.DTOs;
 using WellworkGS.Infra.Persistence.Models;
+using WellworkGS.Infra.Persistence.Repository;
 
 namespace WellworkGS.Service;
 
 public class TemporizadorService
 {
-    private readonly AppDbContext _context;
+    private readonly ITemporizadorRepository _repository;
 
-        public TemporizadorService(AppDbContext context)
+    public TemporizadorService(ITemporizadorRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task<IEnumerable<TemporizadorReadDTO>> GetAllAsync()
+    {
+        var list = await _repository.GetAllAsync();
+
+        return list.Select(t => new TemporizadorReadDTO
         {
-            _context = context;
-        }
+            IdTemporizador = t.IdTemporizador,
+            IdUsuario = t.IdUsuario,
+            TipoTemporizador = t.TipoTemporizador,
+            Duracao = t.Duracao,
+            Inicio = t.Inicio,
+            Fim = t.Fim,
+            StatusTemporizador = t.StatusTemporizador
+        });
+    }
 
-        public async Task<IEnumerable<TemporizadorReadDTO>> GetAllAsync()
+    public async Task<TemporizadorReadDTO?> GetByIdAsync(int id)
+    {
+        var t = await _repository.GetByIdAsync(id);
+        if (t == null) return null;
+
+        return new TemporizadorReadDTO
         {
-            return await _context.Temporizadores
-                .Select(t => new TemporizadorReadDTO
-                {
-                    IdTemporizador = t.IdTemporizador,
-                    IdUsuario = t.IdUsuario,
-                    TipoTemporizador = t.TipoTemporizador,
-                    Duracao = t.Duracao,
-                    Inicio = t.Inicio,
-                    Fim = t.Fim,
-                    StatusTemporizador = t.StatusTemporizador
-                }).ToListAsync();
-        }
+            IdTemporizador = t.IdTemporizador,
+            IdUsuario = t.IdUsuario,
+            TipoTemporizador = t.TipoTemporizador,
+            Duracao = t.Duracao,
+            Inicio = t.Inicio,
+            Fim = t.Fim,
+            StatusTemporizador = t.StatusTemporizador
+        };
+    }
 
-        public async Task<TemporizadorReadDTO?> GetByIdAsync(int id)
+    public async Task<TemporizadorReadDTO> CreateAsync(TemporizadorCreateDTO dto)
+    {
+        var entity = new Temporizador
         {
-            var temporizador = await _context.Temporizadores.FindAsync(id);
-            return temporizador == null
-                ? null
-                : new TemporizadorReadDTO
-                {
-                    IdTemporizador = temporizador.IdTemporizador,
-                    IdUsuario = temporizador.IdUsuario,
-                    TipoTemporizador = temporizador.TipoTemporizador,
-                    Duracao = temporizador.Duracao,
-                    Inicio = temporizador.Inicio,
-                    Fim = temporizador.Fim,
-                    StatusTemporizador = temporizador.StatusTemporizador
-                };
-        }
+            IdUsuario = dto.IdUsuario,
+            TipoTemporizador = dto.TipoTemporizador,
+            Duracao = dto.Duracao,
+            Inicio = dto.Inicio,
+            Fim = dto.Fim,
+            StatusTemporizador = dto.StatusTemporizador
+        };
 
-        public async Task<TemporizadorReadDTO> CreateAsync(TemporizadorCreateDTO dto)
+        await _repository.AddAsync(entity);
+
+        return new TemporizadorReadDTO
         {
-            var entity = new Temporizador
-            {
-                IdUsuario = dto.IdUsuario,
-                TipoTemporizador = dto.TipoTemporizador,
-                Duracao = dto.Duracao,
-                Inicio = dto.Inicio,
-                Fim = dto.Fim,
-                StatusTemporizador = dto.StatusTemporizador
-            };
+            IdTemporizador = entity.IdTemporizador,
+            IdUsuario = entity.IdUsuario,
+            TipoTemporizador = entity.TipoTemporizador,
+            Duracao = entity.Duracao,
+            Inicio = entity.Inicio,
+            Fim = entity.Fim,
+            StatusTemporizador = entity.StatusTemporizador
+        };
+    }
 
-            _context.Temporizadores.Add(entity);
-            await _context.SaveChangesAsync();
+    public async Task<bool> UpdateAsync(int id, TemporizadorUpdateDTO dto)
+    {
+        var t = await _repository.GetByIdAsync(id);
+        if (t == null) return false;
 
-            return new TemporizadorReadDTO
-            {
-                IdTemporizador = entity.IdTemporizador,
-                IdUsuario = entity.IdUsuario,
-                TipoTemporizador = entity.TipoTemporizador,
-                Duracao = entity.Duracao,
-                Inicio = entity.Inicio,
-                Fim = entity.Fim,
-                StatusTemporizador = entity.StatusTemporizador
-            };
-        }
+        t.TipoTemporizador = dto.TipoTemporizador;
+        t.Duracao = dto.Duracao;
+        t.Inicio = dto.Inicio;
+        t.Fim = dto.Fim;
+        t.StatusTemporizador = dto.StatusTemporizador;
 
-        public async Task<bool> UpdateAsync(int id, TemporizadorUpdateDTO dto)
-        {
-            var entity = await _context.Temporizadores.FindAsync(id);
-            if (entity == null) return false;
+        _repository.Update(t);
+        await _repository.SaveChangesAsync();
 
-            entity.TipoTemporizador = dto.TipoTemporizador;
-            entity.Duracao = dto.Duracao;
-            entity.Inicio = dto.Inicio;
-            entity.Fim = dto.Fim;
-            entity.StatusTemporizador = dto.StatusTemporizador;
+        return true;
+    }
 
-            await _context.SaveChangesAsync();
-            return true;
-        }
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var t = await _repository.GetByIdAsync(id);
+        if (t == null) return false;
 
-        public async Task<bool> DeleteAsync(int id)
-        {
-            var entity = await _context.Temporizadores.FindAsync(id);
-            if (entity == null) return false;
-
-            _context.Temporizadores.Remove(entity);
-            await _context.SaveChangesAsync();
-            return true;
-        }
+        await _repository.DeleteAsync(id);
+        return true;
+    }
 }

@@ -2,89 +2,91 @@
 using WellworkGS.Data;
 using WellworkGS.DTOs;
 using WellworkGS.Infra.Persistence.Models;
+using WellworkGS.Infra.Persistence.Repository;
 
 namespace WellworkGS.Service;
 
 public class LembreteService
 {
-    private readonly AppDbContext _context;
+     private readonly ILembreteRepository _repository;
 
-        public LembreteService(AppDbContext context)
+    public LembreteService(ILembreteRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task<IEnumerable<LembreteReadDTO>> GetAllAsync()
+    {
+        var list = await _repository.GetAllAsync();
+
+        return list.Select(l => new LembreteReadDTO
         {
-            _context = context;
-        }
+            IdLembrete = l.IdLembrete,
+            IdUsuario = l.IdUsuario,
+            TipoLembrete = l.TipoLembrete,
+            Frequencia = l.Frequencia,
+            Ativo = l.Ativo
+        });
+    }
 
-        public async Task<IEnumerable<LembreteReadDTO>> GetAllAsync()
+    public async Task<LembreteReadDTO?> GetByIdAsync(int id)
+    {
+        var l = await _repository.GetByIdAsync(id);
+        if (l == null) return null;
+
+        return new LembreteReadDTO
         {
-            return await _context.Lembretes
-                .Select(l => new LembreteReadDTO
-                {
-                    IdLembrete = l.IdLembrete,
-                    IdUsuario = l.IdUsuario,
-                    TipoLembrete = l.TipoLembrete,
-                    Frequencia = l.Frequencia,
-                    Ativo = l.Ativo
-                }).ToListAsync();
-        }
+            IdLembrete = l.IdLembrete,
+            IdUsuario = l.IdUsuario,
+            TipoLembrete = l.TipoLembrete,
+            Frequencia = l.Frequencia,
+            Ativo = l.Ativo
+        };
+    }
 
-        public async Task<LembreteReadDTO?> GetByIdAsync(int id)
+    public async Task<LembreteReadDTO> CreateAsync(LembreteCreateDTO dto)
+    {
+        var entity = new Lembrete
         {
-            var entity = await _context.Lembretes.FindAsync(id);
-            return entity == null
-                ? null
-                : new LembreteReadDTO
-                {
-                    IdLembrete = entity.IdLembrete,
-                    IdUsuario = entity.IdUsuario,
-                    TipoLembrete = entity.TipoLembrete,
-                    Frequencia = entity.Frequencia,
-                    Ativo = entity.Ativo
-                };
-        }
+            IdUsuario = dto.IdUsuario,
+            TipoLembrete = dto.TipoLembrete,
+            Frequencia = dto.Frequencia,
+            Ativo = dto.Ativo
+        };
 
-        public async Task<LembreteReadDTO> CreateAsync(LembreteCreateDTO dto)
+        await _repository.AddAsync(entity);
+
+        return new LembreteReadDTO
         {
-            var entity = new Lembrete
-            {
-                IdUsuario = dto.IdUsuario,
-                TipoLembrete = dto.TipoLembrete,
-                Frequencia = dto.Frequencia,
-                Ativo = dto.Ativo
-            };
+            IdLembrete = entity.IdLembrete,
+            IdUsuario = entity.IdUsuario,
+            TipoLembrete = entity.TipoLembrete,
+            Frequencia = entity.Frequencia,
+            Ativo = entity.Ativo
+        };
+    }
 
-            _context.Lembretes.Add(entity);
-            await _context.SaveChangesAsync();
+    public async Task<bool> UpdateAsync(int id, LembreteUpdateDTO dto)
+    {
+        var l = await _repository.GetByIdAsync(id);
+        if (l == null) return false;
 
-            return new LembreteReadDTO
-            {
-                IdLembrete = entity.IdLembrete,
-                IdUsuario = entity.IdUsuario,
-                TipoLembrete = entity.TipoLembrete,
-                Frequencia = entity.Frequencia,
-                Ativo = entity.Ativo
-            };
-        }
+        l.TipoLembrete = dto.TipoLembrete;
+        l.Frequencia = dto.Frequencia;
+        l.Ativo = dto.Ativo;
 
-        public async Task<bool> UpdateAsync(int id, LembreteUpdateDTO dto)
-        {
-            var entity = await _context.Lembretes.FindAsync(id);
-            if (entity == null) return false;
+        _repository.Update(l);
+        await _repository.SaveChangesAsync();
 
-            entity.TipoLembrete = dto.TipoLembrete;
-            entity.Frequencia = dto.Frequencia;
-            entity.Ativo = dto.Ativo;
+        return true;
+    }
 
-            await _context.SaveChangesAsync();
-            return true;
-        }
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var l = await _repository.GetByIdAsync(id);
+        if (l == null) return false;
 
-        public async Task<bool> DeleteAsync(int id)
-        {
-            var entity = await _context.Lembretes.FindAsync(id);
-            if (entity == null) return false;
-
-            _context.Lembretes.Remove(entity);
-            await _context.SaveChangesAsync();
-            return true;
-        }
+        await _repository.DeleteAsync(id);
+        return true;
+    }
 }

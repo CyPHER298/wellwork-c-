@@ -21,7 +21,6 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Mapeamentos externos (igual seu exemplo)
         modelBuilder.ApplyConfiguration(new UsuarioMapping());
         modelBuilder.ApplyConfiguration(new GestorMapping());
         modelBuilder.ApplyConfiguration(new TarefaMapping());
@@ -30,7 +29,6 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new LembreteMapping());
         modelBuilder.ApplyConfiguration(new AlertaCriseMapping());
 
-        // RELACIONAMENTOS PRINCIPAIS
         modelBuilder.Entity<Tarefa>()
             .HasOne(t => t.Usuario)
             .WithMany(u => u.Tarefas)
