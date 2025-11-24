@@ -8,35 +8,35 @@ public class GestorMapping : IEntityTypeConfiguration<Gestor>
 {
     public void Configure(EntityTypeBuilder<Gestor> builder)
     {
-        builder.ToTable("GESTOR");
+        builder.ToTable("Gestor");
 
         builder.HasKey(g => g.IdGestor);
 
         builder.Property(g => g.IdGestor)
-            .HasColumnName("ID")
+            .HasColumnName("idGestor")
             .ValueGeneratedOnAdd();
 
         builder.Property(g => g.NomeGestor)
-            .HasColumnName("NOME")
+            .HasColumnName("nome_gestor")
             .HasMaxLength(60)
             .IsRequired();
 
         builder.Property(g => g.EmailGestor)
-            .HasColumnName("EMAIL")
+            .HasColumnName("email_gestor")
             .HasMaxLength(40)
             .IsRequired();
 
         builder.Property(g => g.SenhaGestor)
-            .HasColumnName("SENHA")
+            .HasColumnName("senha_gestor")
             .HasMaxLength(10)
             .IsRequired();
 
         builder.Property(g => g.CargoGestor)
-            .HasColumnName("CARGO")
+            .HasColumnName("cargo_gestor")
             .HasMaxLength(30);
 
         builder.Property(g => g.Departamento)
-            .HasColumnName("DEPARTAMENTO")
+            .HasColumnName("departamento")
             .HasMaxLength(100);
 
         builder.HasIndex(g => g.EmailGestor)

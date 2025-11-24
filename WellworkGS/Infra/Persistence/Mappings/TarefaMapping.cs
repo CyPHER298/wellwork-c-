@@ -13,27 +13,27 @@ public class TarefaMapping : IEntityTypeConfiguration<Tarefa>
         builder.HasKey(t => t.IdTarefa);
 
         builder.Property(t => t.IdTarefa)
-            .HasColumnName("ID")
+            .HasColumnName("IDTAREFA")
             .ValueGeneratedOnAdd();
 
         builder.Property(t => t.IdUsuario)
-            .HasColumnName("USUARIO_ID")
+            .HasColumnName("IDUSUARIO")
             .IsRequired();
 
         builder.Property(t => t.TituloTarefa)
-            .HasColumnName("TITULO")
+            .HasColumnName("TITULO_TAREFA")
             .HasMaxLength(30)
             .IsRequired();
 
         builder.Property(t => t.DescricaoTarefa)
-            .HasColumnName("DESCRICAO")
+            .HasColumnName("DESCRICAO_TAREFA")
             .HasMaxLength(100);
 
         builder.Property(t => t.DataHoraTarefa)
-            .HasColumnName("DATAHORA");
+            .HasColumnName("DATAHORA_TAREFA");
 
         builder.Property(t => t.StatusTarefa)
-            .HasColumnName("STATUS")
+            .HasColumnName("STATUS_TAREFA")
             .HasMaxLength(20);
 
         builder.HasOne(t => t.Usuario)

@@ -13,15 +13,15 @@ public class LembreteMapping : IEntityTypeConfiguration<Lembrete>
         builder.HasKey(l => l.IdLembrete);
 
         builder.Property(l => l.IdLembrete)
-            .HasColumnName("ID")
+            .HasColumnName("IDLEMBRETE")
             .ValueGeneratedOnAdd();
 
         builder.Property(l => l.IdUsuario)
-            .HasColumnName("USUARIO_ID")
+            .HasColumnName("IDUSUARIO")
             .IsRequired();
 
         builder.Property(l => l.TipoLembrete)
-            .HasColumnName("TIPO")
+            .HasColumnName("TIPO_LEMBRETE")
             .HasMaxLength(50);
 
         builder.Property(l => l.Frequencia)

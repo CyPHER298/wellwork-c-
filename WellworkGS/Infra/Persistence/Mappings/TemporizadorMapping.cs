@@ -13,15 +13,15 @@ public class TemporizadorMapping : IEntityTypeConfiguration<Temporizador>
         builder.HasKey(t => t.IdTemporizador);
 
         builder.Property(t => t.IdTemporizador)
-            .HasColumnName("ID")
+            .HasColumnName("IDTIMER")
             .ValueGeneratedOnAdd();
 
         builder.Property(t => t.IdUsuario)
-            .HasColumnName("USUARIO_ID")
+            .HasColumnName("IDUSUARIO")
             .IsRequired();
 
         builder.Property(t => t.TipoTemporizador)
-            .HasColumnName("TIPO")
+            .HasColumnName("TIPO_TIMER")
             .HasMaxLength(20);
 
         builder.Property(t => t.Duracao)
@@ -34,7 +34,7 @@ public class TemporizadorMapping : IEntityTypeConfiguration<Temporizador>
             .HasColumnName("FIM");
 
         builder.Property(t => t.StatusTemporizador)
-            .HasColumnName("STATUS")
+            .HasColumnName("STATUS_TIMER")
             .HasMaxLength(20);
 
         builder.HasOne(t => t.Usuario)
