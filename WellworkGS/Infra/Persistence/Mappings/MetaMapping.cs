@@ -13,20 +13,20 @@ public class MetaMapping : IEntityTypeConfiguration<Meta>
         builder.HasKey(m => m.IdMeta);
 
         builder.Property(m => m.IdMeta)
-            .HasColumnName("IDMETA")
+            .HasColumnName("ID")
             .ValueGeneratedOnAdd();
 
         builder.Property(m => m.TituloMeta)
-            .HasColumnName("TITULO_META")
+            .HasColumnName("TITULO")
             .HasMaxLength(50)
             .IsRequired();
 
         builder.Property(m => m.DescricaoMeta)
-            .HasColumnName("DESCRICAO_META")
+            .HasColumnName("DESCRICAO")
             .HasMaxLength(90);
 
         builder.Property(m => m.IdUsuario)
-            .HasColumnName("IDUSUARIO");
+            .HasColumnName("USUARIO_ID");
 
         builder.HasOne(m => m.Usuario)
             .WithMany(u => u.Metas)

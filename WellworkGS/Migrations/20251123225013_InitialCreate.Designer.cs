@@ -12,7 +12,7 @@ using WellworkGS.Data;
 namespace WellworkGS.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251123141002_InitialCreate")]
+    [Migration("20251123225013_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -66,7 +66,7 @@ namespace WellworkGS.Migrations
                     b.Property<int>("IdGestor")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("NUMBER(10)")
-                        .HasColumnName("IDGESTOR");
+                        .HasColumnName("idGestor");
 
                     OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdGestor"));
 
@@ -74,38 +74,38 @@ namespace WellworkGS.Migrations
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("NVARCHAR2(30)")
-                        .HasColumnName("CARGO_GESTOR");
+                        .HasColumnName("cargo_gestor");
 
                     b.Property<string>("Departamento")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("NVARCHAR2(100)")
-                        .HasColumnName("DEPARTAMENTO");
+                        .HasColumnName("departamento");
 
                     b.Property<string>("EmailGestor")
                         .IsRequired()
                         .HasMaxLength(40)
                         .HasColumnType("NVARCHAR2(40)")
-                        .HasColumnName("EMAIL_GESTOR");
+                        .HasColumnName("email_gestor");
 
                     b.Property<string>("NomeGestor")
                         .IsRequired()
                         .HasMaxLength(60)
                         .HasColumnType("NVARCHAR2(60)")
-                        .HasColumnName("NOME_GESTOR");
+                        .HasColumnName("nome_gestor");
 
                     b.Property<string>("SenhaGestor")
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("NVARCHAR2(10)")
-                        .HasColumnName("SENHA_GESTOR");
+                        .HasColumnName("senha_gestor");
 
                     b.HasKey("IdGestor");
 
                     b.HasIndex("EmailGestor")
                         .IsUnique();
 
-                    b.ToTable("GESTOR", (string)null);
+                    b.ToTable("Gestor", (string)null);
                 });
 
             modelBuilder.Entity("WellworkGS.Infra.Persistence.Models.Lembrete", b =>
@@ -267,7 +267,7 @@ namespace WellworkGS.Migrations
                     b.Property<int>("IdUsuario")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("NUMBER(10)")
-                        .HasColumnName("IDUSUARIO");
+                        .HasColumnName("idUsuario");
 
                     OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdUsuario"));
 
@@ -275,38 +275,38 @@ namespace WellworkGS.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("NVARCHAR2(50)")
-                        .HasColumnName("ACESSIBILIDADE");
+                        .HasColumnName("acessibilidade");
 
                     b.Property<string>("CargoUsuario")
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("NVARCHAR2(30)")
-                        .HasColumnName("CARGO_USUARIO");
+                        .HasColumnName("cargo_usuario");
 
                     b.Property<string>("EmailUsuario")
                         .IsRequired()
                         .HasMaxLength(40)
                         .HasColumnType("NVARCHAR2(40)")
-                        .HasColumnName("EMAIL_USUARIO");
+                        .HasColumnName("email_usuario");
 
                     b.Property<string>("NomeUsuario")
                         .IsRequired()
                         .HasMaxLength(60)
                         .HasColumnType("NVARCHAR2(60)")
-                        .HasColumnName("NOME_USUARIO");
+                        .HasColumnName("nome_usuario");
 
                     b.Property<string>("SenhaUsuario")
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("NVARCHAR2(10)")
-                        .HasColumnName("SENHA_USUARIO");
+                        .HasColumnName("senha_usuario");
 
                     b.HasKey("IdUsuario");
 
                     b.HasIndex("EmailUsuario")
                         .IsUnique();
 
-                    b.ToTable("USUARIO", (string)null);
+                    b.ToTable("Usuario", (string)null);
                 });
 
             modelBuilder.Entity("WellworkGS.Infra.Persistence.Models.AlertaCrise", b =>

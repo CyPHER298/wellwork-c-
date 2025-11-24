@@ -8,9 +8,9 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
     public AppDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-        
+
         var connectionString =
-            "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle.fiap.com.br)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=orcl)));User Id=rm99742;Password=290305;";
+            "User Id=rm99742;Password=290305;Data Source=oracle.fiap.com.br:1521/orcl;";
 
         optionsBuilder.UseOracle(connectionString);
 

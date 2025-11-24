@@ -22,8 +22,8 @@ public class UsuarioController : ControllerBase
         [FromQuery] string? cargo,
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 10,
-        [FromQuery] string sortBy = "nome",          // nome | email | cargo
-        [FromQuery] string sortDirection = "asc"     // asc | desc
+        [FromQuery] string sortBy = "nome",         
+        [FromQuery] string sortDirection = "asc"    
     )
     {
         // 1) Busca todos via service

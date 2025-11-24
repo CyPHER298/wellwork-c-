@@ -2,6 +2,7 @@
 
 public class AlertaCrise
 {
+    
     public int IdAlertaCrise { get; set; }
     public int IdUsuario { get; set; }
     public int IdGestor { get; set; }

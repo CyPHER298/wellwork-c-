@@ -8,27 +8,27 @@ public class AlertaCriseMapping : IEntityTypeConfiguration<AlertaCrise>
 {
     public void Configure(EntityTypeBuilder<AlertaCrise> builder)
     {
-        builder.ToTable("ALERTACRISE");
+        builder.ToTable("ALERTA_CRISE");
 
         builder.HasKey(a => a.IdAlertaCrise);
 
         builder.Property(a => a.IdAlertaCrise)
-            .HasColumnName("IDALERTACRISE")
+            .HasColumnName("ID")
             .ValueGeneratedOnAdd();
 
         builder.Property(a => a.IdUsuario)
-            .HasColumnName("IDUSUARIO")
+            .HasColumnName("USUARIO_ID")
             .IsRequired();
 
         builder.Property(a => a.IdGestor)
-            .HasColumnName("IDGESTOR")
+            .HasColumnName("GESTOR_ID")
             .IsRequired();
 
         builder.Property(a => a.DataHoraAlerta)
-            .HasColumnName("DATAHORA_ALERTA");
+            .HasColumnName("DATAHORA");
 
         builder.Property(a => a.StatusAlerta)
-            .HasColumnName("STATUS_ALERTA")
+            .HasColumnName("STATUS")
             .HasMaxLength(20);
 
         builder.HasOne(a => a.Usuario)

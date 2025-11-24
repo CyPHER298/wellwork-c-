@@ -13,26 +13,26 @@ public class GestorMapping : IEntityTypeConfiguration<Gestor>
         builder.HasKey(g => g.IdGestor);
 
         builder.Property(g => g.IdGestor)
-            .HasColumnName("IDGESTOR")
+            .HasColumnName("ID")
             .ValueGeneratedOnAdd();
 
         builder.Property(g => g.NomeGestor)
-            .HasColumnName("NOME_GESTOR")
+            .HasColumnName("NOME")
             .HasMaxLength(60)
             .IsRequired();
 
         builder.Property(g => g.EmailGestor)
-            .HasColumnName("EMAIL_GESTOR")
+            .HasColumnName("EMAIL")
             .HasMaxLength(40)
             .IsRequired();
 
         builder.Property(g => g.SenhaGestor)
-            .HasColumnName("SENHA_GESTOR")
+            .HasColumnName("SENHA")
             .HasMaxLength(10)
             .IsRequired();
 
         builder.Property(g => g.CargoGestor)
-            .HasColumnName("CARGO_GESTOR")
+            .HasColumnName("CARGO")
             .HasMaxLength(30);
 
         builder.Property(g => g.Departamento)

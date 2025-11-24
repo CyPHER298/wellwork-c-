@@ -12,37 +12,37 @@ namespace WellworkGS.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "GESTOR",
+                name: "Gestor",
                 columns: table => new
                 {
-                    IDGESTOR = table.Column<int>(type: "NUMBER(10)", nullable: false)
+                    idGestor = table.Column<int>(type: "NUMBER(10)", nullable: false)
                         .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
-                    NOME_GESTOR = table.Column<string>(type: "NVARCHAR2(60)", maxLength: 60, nullable: false),
-                    EMAIL_GESTOR = table.Column<string>(type: "NVARCHAR2(40)", maxLength: 40, nullable: false),
-                    SENHA_GESTOR = table.Column<string>(type: "NVARCHAR2(10)", maxLength: 10, nullable: false),
-                    CARGO_GESTOR = table.Column<string>(type: "NVARCHAR2(30)", maxLength: 30, nullable: false),
-                    DEPARTAMENTO = table.Column<string>(type: "NVARCHAR2(100)", maxLength: 100, nullable: false)
+                    nome_gestor = table.Column<string>(type: "NVARCHAR2(60)", maxLength: 60, nullable: false),
+                    email_gestor = table.Column<string>(type: "NVARCHAR2(40)", maxLength: 40, nullable: false),
+                    senha_gestor = table.Column<string>(type: "NVARCHAR2(10)", maxLength: 10, nullable: false),
+                    cargo_gestor = table.Column<string>(type: "NVARCHAR2(30)", maxLength: 30, nullable: false),
+                    departamento = table.Column<string>(type: "NVARCHAR2(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GESTOR", x => x.IDGESTOR);
+                    table.PrimaryKey("PK_Gestor", x => x.idGestor);
                 });
 
             migrationBuilder.CreateTable(
-                name: "USUARIO",
+                name: "Usuario",
                 columns: table => new
                 {
-                    IDUSUARIO = table.Column<int>(type: "NUMBER(10)", nullable: false)
+                    idUsuario = table.Column<int>(type: "NUMBER(10)", nullable: false)
                         .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
-                    NOME_USUARIO = table.Column<string>(type: "NVARCHAR2(60)", maxLength: 60, nullable: false),
-                    EMAIL_USUARIO = table.Column<string>(type: "NVARCHAR2(40)", maxLength: 40, nullable: false),
-                    SENHA_USUARIO = table.Column<string>(type: "NVARCHAR2(10)", maxLength: 10, nullable: false),
-                    CARGO_USUARIO = table.Column<string>(type: "NVARCHAR2(30)", maxLength: 30, nullable: false),
-                    ACESSIBILIDADE = table.Column<string>(type: "NVARCHAR2(50)", maxLength: 50, nullable: false)
+                    nome_usuario = table.Column<string>(type: "NVARCHAR2(60)", maxLength: 60, nullable: false),
+                    email_usuario = table.Column<string>(type: "NVARCHAR2(40)", maxLength: 40, nullable: false),
+                    senha_usuario = table.Column<string>(type: "NVARCHAR2(10)", maxLength: 10, nullable: false),
+                    cargo_usuario = table.Column<string>(type: "NVARCHAR2(30)", maxLength: 30, nullable: false),
+                    acessibilidade = table.Column<string>(type: "NVARCHAR2(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_USUARIO", x => x.IDUSUARIO);
+                    table.PrimaryKey("PK_Usuario", x => x.idUsuario);
                 });
 
             migrationBuilder.CreateTable(
@@ -60,16 +60,16 @@ namespace WellworkGS.Migrations
                 {
                     table.PrimaryKey("PK_ALERTACRISE", x => x.IDALERTACRISE);
                     table.ForeignKey(
-                        name: "FK_ALERTACRISE_GESTOR_IDGESTOR",
+                        name: "FK_ALERTACRISE_Gestor_IDGESTOR",
                         column: x => x.IDGESTOR,
-                        principalTable: "GESTOR",
-                        principalColumn: "IDGESTOR",
+                        principalTable: "Gestor",
+                        principalColumn: "idGestor",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ALERTACRISE_USUARIO_IDUSUARIO",
+                        name: "FK_ALERTACRISE_Usuario_IDUSUARIO",
                         column: x => x.IDUSUARIO,
-                        principalTable: "USUARIO",
-                        principalColumn: "IDUSUARIO",
+                        principalTable: "Usuario",
+                        principalColumn: "idUsuario",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -88,10 +88,10 @@ namespace WellworkGS.Migrations
                 {
                     table.PrimaryKey("PK_LEMBRETE", x => x.IDLEMBRETE);
                     table.ForeignKey(
-                        name: "FK_LEMBRETE_USUARIO_IDUSUARIO",
+                        name: "FK_LEMBRETE_Usuario_IDUSUARIO",
                         column: x => x.IDUSUARIO,
-                        principalTable: "USUARIO",
-                        principalColumn: "IDUSUARIO",
+                        principalTable: "Usuario",
+                        principalColumn: "idUsuario",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -109,10 +109,10 @@ namespace WellworkGS.Migrations
                 {
                     table.PrimaryKey("PK_META", x => x.IDMETA);
                     table.ForeignKey(
-                        name: "FK_META_USUARIO_IDUSUARIO",
+                        name: "FK_META_Usuario_IDUSUARIO",
                         column: x => x.IDUSUARIO,
-                        principalTable: "USUARIO",
-                        principalColumn: "IDUSUARIO");
+                        principalTable: "Usuario",
+                        principalColumn: "idUsuario");
                 });
 
             migrationBuilder.CreateTable(
@@ -131,10 +131,10 @@ namespace WellworkGS.Migrations
                 {
                     table.PrimaryKey("PK_TAREFA", x => x.IDTAREFA);
                     table.ForeignKey(
-                        name: "FK_TAREFA_USUARIO_IDUSUARIO",
+                        name: "FK_TAREFA_Usuario_IDUSUARIO",
                         column: x => x.IDUSUARIO,
-                        principalTable: "USUARIO",
-                        principalColumn: "IDUSUARIO",
+                        principalTable: "Usuario",
+                        principalColumn: "idUsuario",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -155,10 +155,10 @@ namespace WellworkGS.Migrations
                 {
                     table.PrimaryKey("PK_TIMER", x => x.IDTIMER);
                     table.ForeignKey(
-                        name: "FK_TIMER_USUARIO_IDUSUARIO",
+                        name: "FK_TIMER_Usuario_IDUSUARIO",
                         column: x => x.IDUSUARIO,
-                        principalTable: "USUARIO",
-                        principalColumn: "IDUSUARIO",
+                        principalTable: "Usuario",
+                        principalColumn: "idUsuario",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -173,9 +173,9 @@ namespace WellworkGS.Migrations
                 column: "IDUSUARIO");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GESTOR_EMAIL_GESTOR",
-                table: "GESTOR",
-                column: "EMAIL_GESTOR",
+                name: "IX_Gestor_email_gestor",
+                table: "Gestor",
+                column: "email_gestor",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -199,9 +199,9 @@ namespace WellworkGS.Migrations
                 column: "IDUSUARIO");
 
             migrationBuilder.CreateIndex(
-                name: "IX_USUARIO_EMAIL_USUARIO",
-                table: "USUARIO",
-                column: "EMAIL_USUARIO",
+                name: "IX_Usuario_email_usuario",
+                table: "Usuario",
+                column: "email_usuario",
                 unique: true);
         }
 
@@ -224,10 +224,10 @@ namespace WellworkGS.Migrations
                 name: "TIMER");
 
             migrationBuilder.DropTable(
-                name: "GESTOR");
+                name: "Gestor");
 
             migrationBuilder.DropTable(
-                name: "USUARIO");
+                name: "Usuario");
         }
     }
 }

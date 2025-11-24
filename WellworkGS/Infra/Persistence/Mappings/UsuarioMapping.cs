@@ -13,26 +13,26 @@ public class UsuarioMapping : IEntityTypeConfiguration<Usuario>
         builder.HasKey(u => u.IdUsuario);
 
         builder.Property(u => u.IdUsuario)
-            .HasColumnName("IDUSUARIO")
+            .HasColumnName("ID")
             .ValueGeneratedOnAdd();
 
         builder.Property(u => u.NomeUsuario)
-            .HasColumnName("NOME_USUARIO")
+            .HasColumnName("NOME")
             .HasMaxLength(60)
             .IsRequired();
 
         builder.Property(u => u.EmailUsuario)
-            .HasColumnName("EMAIL_USUARIO")
+            .HasColumnName("EMAIL")
             .HasMaxLength(40)
             .IsRequired();
 
         builder.Property(u => u.SenhaUsuario)
-            .HasColumnName("SENHA_USUARIO")
+            .HasColumnName("SENHA")
             .HasMaxLength(10)
             .IsRequired();
 
         builder.Property(u => u.CargoUsuario)
-            .HasColumnName("CARGO_USUARIO")
+            .HasColumnName("CARGO")
             .HasMaxLength(30);
 
         builder.Property(u => u.Acessibilidade)
