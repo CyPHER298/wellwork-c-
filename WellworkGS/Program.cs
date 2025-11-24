@@ -13,9 +13,10 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        var swaggerConfig = builder.Configuration
-            .GetSection("Swagger")
-            .Get<SwaggerConfig>();
+        var swaggerConfig = builder
+                    .Configuration
+                    .GetSection("Swagger")
+                    .Get<SwaggerConfig>();
 
 
         builder.Services.AddControllers();
@@ -70,17 +71,16 @@ public class Program
         var app = builder.Build();
 
         if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI(ui =>
-            {
-                ui.SwaggerEndpoint("/swagger/v1/swagger.json", "WellworkGS API v1");
-                ui.RoutePrefix = string.Empty;
-            });
-
-            app.MapOpenApi();
-        }
-
+                {
+                    app.UseSwagger();
+                    app.UseSwaggerUI(ui =>
+                        {
+                            ui.SwaggerEndpoint("/swagger/v1/swagger.json",  "Faculdade.API v1");
+                            ui.RoutePrefix = string.Empty;
+                        }
+                    );
+                }
+        
         app.UseHttpsRedirection();
         app.UseAuthorization();
         app.MapControllers();
