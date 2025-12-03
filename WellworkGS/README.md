@@ -9,6 +9,22 @@ O banco de dados utilizado é **Oracle**, com suporte total a migrations via Ent
 
 ---
 
+## 👥 **Integrantes do Grupo**
+
+| Nome Completo | Função / Responsabilidade |
+---
+| **Henrique Batista de Souza - RM99742** | Líder do Projeto / Desenvolvedor Full-Stack (Java & ASP.NET / React.js &
+React-Native & Typescript) |
+
+| **Julia Lima Rodrigues - RM559781** | Desenvolvedora Back-end (Java & ASP.NET) / DevOps (Microsoft Azure) / QA &
+Insurance |
+
+| **Felipe Soares Gonçalves - RM559175** | Desenvolvedor Front-End (React.js) / Desenvolvedor Mobile (React-Native) /
+Desenvolvedor IOT (Arduino) / Banco de Dados (OracleSQL) |
+
+
+---
+
 # 🧩 1. Visão Geral
 
 O sistema fornece funcionalidades como:
